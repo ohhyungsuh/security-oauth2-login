@@ -44,3 +44,6 @@ out/
 !gradle-wrapper.jar
 .gitattributes
 .DS_Store
+
+/src/main/resources/application-oauth.yml
+/src/main/resources/application-jwt.yml
