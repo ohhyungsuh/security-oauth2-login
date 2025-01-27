@@ -1,9 +1,10 @@
 HELP.md
-.gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.DS_Store
 
 ### STS ###
 .apt_generated
@@ -43,7 +44,11 @@ out/
 !src/**/build/
 !gradle-wrapper.jar
 .gitattributes
+
 .DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
 
 /src/main/resources/application-oauth.yml
 /src/main/resources/application-jwt.yml
