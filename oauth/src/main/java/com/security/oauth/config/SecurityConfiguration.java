@@ -33,13 +33,9 @@ public class SecurityConfiguration {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final JwtFilter jwtFilter;
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/css/**", "/error");
-    }
 
     private final String[] whitelist = {
-            "/", "/login", "/logout", "/auth/success",
+            "/", "/login", "/logout",
             "/css/**", "/error"
     };
 
