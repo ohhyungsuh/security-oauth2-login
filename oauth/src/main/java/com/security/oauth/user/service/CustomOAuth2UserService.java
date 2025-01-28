@@ -30,6 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
          * the OAuth 2.0 token attributes
          * scope로 받아온 것들
          */
+
         // super.loadUser(userRequest)은 OAuth2User 객체이며, 출력 값은 속성, 권한 등이다. 그걸 Map에 넣어주자.
         // 참고로 naver는 "response" 키를 가진 Value 안에 값들이 있다.
         Map<String, Object> attributes = super.loadUser(userRequest).getAttributes();

@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,12 +30,30 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        log.debug("Access token: {}", accessToken);
-        log.debug("Refresh token: {}", refreshToken);
+        log.debug("access token: {}", accessToken);
+        log.debug("refresh token: {}", refreshToken);
 
-        // 검증하고, Security Context에 Authenticaiton 객체 만들어서 넣기
-        // todo: 검증하는 메소드는 JwtProvider에 만들기
+        validateTokens(response, accessToken, refreshToken);
+
+        setAuthentication(accessToken);
 
         filterChain.doFilter(request, response);
+    }
+
+    private void validateTokens(HttpServletResponse response, String accessToken, String refreshToken) {
+        if(!jwtProvider.validateToken(accessToken)) {
+            if(jwtProvider.validateToken(refreshToken)) {
+                String newAccessToken = jwtProvider.reissueAccessToken(refreshToken);
+                response.setHeader("Authorization", "Bearer " + newAccessToken);
+            }
+
+            log.debug("Refresh token is expired");
+        }
+
+    }
+
+    private void setAuthentication(String accessToken) {
+        Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

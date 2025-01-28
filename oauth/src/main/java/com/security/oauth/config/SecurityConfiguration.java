@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,13 +33,18 @@ public class SecurityConfiguration {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final JwtFilter jwtFilter;
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/css/**", "/error");
+    }
+
     private final String[] whitelist = {
-            "/", "/login", "/logout",
+            "/", "/login", "/logout", "/auth/success",
             "/css/**", "/error"
     };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 됨 (cookie를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어)
                 // jwt 발급해서 stateless 상태로 관리하기 때문에 꺼도 된다
@@ -60,13 +65,13 @@ public class SecurityConfiguration {
                         .requestMatchers(whitelist).permitAll()
                         .anyRequest().authenticated())
 
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)
                 )
+
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();

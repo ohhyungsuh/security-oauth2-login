@@ -32,6 +32,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.setHeader("refresh", refresh);
 
         // 리다이렉트 주소 따로
-        response.sendRedirect("/my");
+        response.sendRedirect("localhost:8080/my");
     }
 }

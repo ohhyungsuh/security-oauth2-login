@@ -40,7 +40,8 @@ public class PrincipalUserDetails implements OAuth2User, UserDetails {
     // AuthenticationPrincipal 상속, OAuth2 서비스의 주된 식별자 반환
     @Override
     public String getName() {
-        return user.getEmail();
+        return "";
+//        return user.getName();
     }
 
     /************************************************************/
@@ -73,11 +74,10 @@ public class PrincipalUserDetails implements OAuth2User, UserDetails {
     }
 
     /*
-     * 기본 인증, 인가에 필요한 주된 식별자 반환(로그인 아이디)
-     * 필요하면 로그인 아이디 추가
+     * 기본 인증, 인가에 필요한 주된 식별자 반환
      */
     @Override
     public String getUsername() {
-        return null;
+        return user.getEmail();
     }
 }
