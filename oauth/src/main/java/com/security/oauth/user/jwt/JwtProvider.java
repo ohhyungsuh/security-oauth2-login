@@ -61,6 +61,10 @@ public class JwtProvider {
                 .collect(Collectors.joining());
 
         log.debug("Generating access token for user: {}", authentication.getName());
+        log.debug("Authentication Authorities: {}", authentication.getAuthorities());
+        log.debug("Authentication Name: {}", authentication.getName());
+        log.debug("Authentication Principal: {}", authentication.getPrincipal());
+        log.debug("Authentication Credentials: {}", authentication.getCredentials());
 
         return Jwts.builder()
                 .subject(authentication.getName())
@@ -121,9 +125,15 @@ public class JwtProvider {
      * }
      */
     private Claims parseClaims(String refreshToken) {
-        return Jwts.parser().verifyWith(secretKey).build()
-                .parseSignedClaims(refreshToken)
-                .getPayload();
+        try {
+            return Jwts.parser().verifyWith(secretKey).build()
+                    .parseSignedClaims(refreshToken)
+                    .getPayload();
+        } catch (JwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            throw new JwtException("Invalid JWT token");
+        }
+
     }
 
     public String reissueAccessToken(String refreshToken) {
@@ -146,6 +156,6 @@ public class JwtProvider {
         User userPrincipal = new User(claims.getSubject(), "", authorities);
         log.debug("User: {}", userPrincipal);
         // credentials?
-        return new UsernamePasswordAuthenticationToken(userPrincipal, "", authorities);
+        return new UsernamePasswordAuthenticationToken(userPrincipal, token, authorities);
     }
 }

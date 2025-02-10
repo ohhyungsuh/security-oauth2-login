@@ -22,16 +22,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = request.getHeader("Authorization");
+        log.info("JwtFilter 실행됨: {}", request.getRequestURI());
+
+        String accessToken = request.getHeader("access");
         String refreshToken = request.getHeader("refresh");
+
+        log.info("access token: {}", accessToken);
+        log.info("refresh token: {}", refreshToken);
 
         if(accessToken == null || accessToken.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        log.debug("access token: {}", accessToken);
-        log.debug("refresh token: {}", refreshToken);
 
         validateTokens(response, accessToken, refreshToken);
 
@@ -44,7 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if(!jwtProvider.validateToken(accessToken)) {
             if(jwtProvider.validateToken(refreshToken)) {
                 String newAccessToken = jwtProvider.reissueAccessToken(refreshToken);
-                response.setHeader("Authorization", "Bearer " + newAccessToken);
+                response.setHeader("access", newAccessToken);
             }
 
             log.debug("Refresh token is expired");
@@ -54,6 +56,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private void setAuthentication(String accessToken) {
         Authentication authentication = jwtProvider.getAuthentication(accessToken);
+
+        log.info("최종 SecurityContext Authentication: {}", authentication);
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

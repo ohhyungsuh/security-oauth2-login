@@ -23,7 +23,7 @@ import java.util.List;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfiguration {
@@ -35,7 +35,9 @@ public class SecurityConfiguration {
 
 
     private final String[] whitelist = {
-            "/", "/login", "/logout",
+            "/", "/login",
+            "/auth/success",
+            "/api/v1/user",
             "/css/**", "/error"
     };
 
@@ -54,6 +56,7 @@ public class SecurityConfiguration {
 
                 // 세션 비활성화 - jwt에서 주로 설정하며, 인증 정보를 매 요청마다 클라이언트가 서버에 보내야 한다
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+
                 .cors(cors -> cors.configurationSource(setCorsConfigurationSource()))
 
                 // whitelist로 설정 하는 것이 깔끔
