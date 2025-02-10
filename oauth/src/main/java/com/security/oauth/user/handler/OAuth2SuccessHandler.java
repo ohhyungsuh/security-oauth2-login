@@ -1,7 +1,6 @@
 package com.security.oauth.user.handler;
 
 import com.security.oauth.user.jwt.JwtProvider;
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,8 +21,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtProvider jwtProvider;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        log.info("OAuth2SuccessHandler");
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("========== OAuth2SuccessHandler 실행됨 ==========");
         log.info("Authentication: {}", authentication);
         log.info("Principal: {}", authentication.getPrincipal());
@@ -39,7 +37,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.setHeader("access", access);
         response.setHeader("refresh", refresh);
 
-        // 리다이렉트 주소 따로
-        response.sendRedirect("http://localhost:8080/auth/success");
+//        // 리다이렉트 주소 따로
+//        response.sendRedirect("http://localhost:8080/auth/success");
     }
 }

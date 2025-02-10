@@ -35,7 +35,7 @@ public class SecurityConfiguration {
 
 
     private final String[] whitelist = {
-            "/", "/login",
+            "/",
             "/auth/success",
             "/api/v1/user",
             "/css/**", "/error"
