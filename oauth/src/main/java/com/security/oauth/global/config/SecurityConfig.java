@@ -2,15 +2,20 @@ package com.security.oauth.global.config;
 
 import com.security.oauth.user.handler.OAuth2FailureHandler;
 import com.security.oauth.user.handler.OAuth2SuccessHandler;
+import com.security.oauth.user.jwt.CustomLoginFilter;
 import com.security.oauth.user.jwt.JwtFilter;
+import com.security.oauth.user.jwt.JwtProvider;
 import com.security.oauth.user.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,11 +37,15 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final JwtFilter jwtFilter;
 
+    private final JwtProvider jwtProvider;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
+    // 홈 화면, css, error 페이지, 회원가입 및 로그인 api
     private final String[] whitelist = {
-            "/",
+            "/", "/login",
             "/auth/success",
-            "/api/v1/user",
+            "/api/v1/users/oauth2-join",
+            "/api/v1/users/join",
             "/css/**", "/error"
     };
 
@@ -70,7 +79,9 @@ public class SecurityConfig {
                 )
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        ;
+
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtProvider),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -95,5 +106,15 @@ public class SecurityConfig {
 
 
         return source;
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

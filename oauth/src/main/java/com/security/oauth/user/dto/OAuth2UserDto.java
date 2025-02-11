@@ -1,5 +1,6 @@
 package com.security.oauth.user.dto;
 
+import com.security.oauth.user.domain.Provider;
 import com.security.oauth.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ public class OAuth2UserDto {
 
     private String name;
     private String email;
+    private Provider provider;
 
     /*
      * 구글, 깃헙, 네이버 등 서비스에 따라 제공되는 데이터가 모두 다르다.
@@ -31,13 +33,11 @@ public class OAuth2UserDto {
         return OAuth2UserDto.builder()
                 .name(attributes.get("name").toString())
                 .email(attributes.get("email").toString())
+                .provider(Provider.GOOGLE)
                 .build();
     }
 
     public User toUser() {
-        return User.builder()
-                .name(name)
-                .email(email)
-                .build();
+        return User.joinOAuth2User(name, email, provider);
     }
 }

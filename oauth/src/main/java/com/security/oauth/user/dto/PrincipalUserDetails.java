@@ -12,11 +12,19 @@ import java.util.List;
 import java.util.Map;
 
 
-@RequiredArgsConstructor
 public class PrincipalUserDetails implements OAuth2User, UserDetails {
 
     private final User user;
-    private final Map<String, Object> attributes;
+    private Map<String, Object> attributes;
+
+    public PrincipalUserDetails(User user) {
+        this.user = user;
+    }
+
+    public PrincipalUserDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
+    }
 
     /*
      * 사용자 권한 반환하는건데, User 엔티티에서 따로 정해줘서 그거 반환
@@ -25,7 +33,7 @@ public class PrincipalUserDetails implements OAuth2User, UserDetails {
     // OAuth2User, UserDetails 모두 구현 필요한 메소드임
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 만약 role이 여러개면 바꿔주기
+        // todo: role 여러개인 경우도 있으니 바꿔주기
         return List.of(new SimpleGrantedAuthority(user.getRole().getValue()));
     }
 
@@ -67,10 +75,9 @@ public class PrincipalUserDetails implements OAuth2User, UserDetails {
         return true;
     }
 
-    // 이건 안 하는 게 좋음
     @Override
     public String getPassword() {
-        return "";
+        return user.getPassword();
     }
 
     /*

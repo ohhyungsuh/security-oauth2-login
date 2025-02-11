@@ -60,11 +60,11 @@ public class JwtProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining());
 
-        log.debug("Generating access token for user: {}", authentication.getName());
-        log.debug("Authentication Authorities: {}", authentication.getAuthorities());
-        log.debug("Authentication Name: {}", authentication.getName());
-        log.debug("Authentication Principal: {}", authentication.getPrincipal());
-        log.debug("Authentication Credentials: {}", authentication.getCredentials());
+        log.info("Generating access token for user: {}", authentication.getName());
+        log.info("Authentication Authorities: {}", authentication.getAuthorities());
+        log.info("Authentication Name: {}", authentication.getName());
+        log.info("Authentication Principal: {}", authentication.getPrincipal());
+        log.info("Authentication Credentials: {}", authentication.getCredentials());
 
         return Jwts.builder()
                 .subject(authentication.getName())

@@ -60,6 +60,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User getOrSave(OAuth2UserDto oAuth2UserDto) {
+        log.debug("OAuth2UserDto name, email: {}, {}", oAuth2UserDto.getName(), oAuth2UserDto.getEmail());
+        log.debug("OAuth2UserDto provider: {}", oAuth2UserDto.getProvider());
+
         User user = userRepository.findByEmail(oAuth2UserDto.getEmail())
                 .orElseGet(oAuth2UserDto::toUser);
 
