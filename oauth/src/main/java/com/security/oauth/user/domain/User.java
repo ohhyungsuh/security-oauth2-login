@@ -3,9 +3,11 @@ package com.security.oauth.user.domain;
 import com.security.oauth.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 
+@Slf4j
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,8 +34,32 @@ public class User extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-    // 일반 회원가입 Builder
-    @Builder(builderMethodName = "localUserBuilder")
+//    // 일반 회원가입 Builder
+//    @Builder(builderMethodName = "localUserBuilder")
+//    private User(String name, String email, String password, LocalDate birth) {
+//        this.name = name;
+//        this.email = email;
+//        this.password = password;
+//        this.birth = birth;
+//
+//        this.provider = Provider.LOCAL;
+//        this.role = Role.USER;
+//        this.isDeleted = false;
+//    }
+
+//    // 소셜 회원가입 Builder
+//    @Builder(builderMethodName = "oAuth2UserBuilder")
+//    private User(String name, String email, Provider provider) {
+//        this.name = name;
+//        this.email = email;
+//        this.provider = provider;
+//
+//        this.password = "";
+//        this.role = Role.USER;
+//        this.isDeleted = false;
+//    }
+
+    // 일반 회원가입 생성자
     private User(String name, String email, String password, LocalDate birth) {
         this.name = name;
         this.email = email;
@@ -45,8 +71,7 @@ public class User extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
-    // 소셜 회원가입 Builder
-    @Builder(builderMethodName = "oAuth2UserBuilder")
+    // 소셜 회원가입 생성자
     private User(String name, String email, Provider provider) {
         this.name = name;
         this.email = email;
@@ -57,21 +82,29 @@ public class User extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
+//    public static User joinLocalUser(String name, String email, String password, LocalDate birth) {
+//        return User.localUserBuilder()
+//                .name(name)
+//                .email(email)
+//                .password(password)
+//                .birth(birth)
+//                .build();
+//    }
+
+//    public static User joinOAuth2User(String name, String email, Provider provider) {
+//        return User.oAuth2UserBuilder()
+//                .name(name)
+//                .email(email)
+//                .provider(provider)
+//                .build();
+//    }
+
     public static User joinLocalUser(String name, String email, String password, LocalDate birth) {
-        return User.localUserBuilder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .birth(birth)
-                .build();
+        return new User(name, email, password, birth);
     }
 
     public static User joinOAuth2User(String name, String email, Provider provider) {
-        return User.oAuth2UserBuilder()
-                .name(name)
-                .email(email)
-                .provider(provider)
-                .build();
+        return new User(name, email, provider);
     }
 
     // OAuth2 회원가입시 사용
