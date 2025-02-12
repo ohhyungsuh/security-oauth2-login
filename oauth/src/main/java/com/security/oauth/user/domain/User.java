@@ -108,8 +108,7 @@ public class User extends BaseTimeEntity {
     }
 
     // OAuth2 회원가입시 사용
-    public User updateOAuth2UserBirth(LocalDate birth) {
+    public void updateOAuth2UserBirth(LocalDate birth) {
         this.birth = birth;
-        return this;
     }
 }

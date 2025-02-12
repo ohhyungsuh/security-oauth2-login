@@ -8,6 +8,6 @@ public class MainController {
 
     @GetMapping("/")
     public String main() {
-        return "main test";
+        return "로그인 필요 없는 메인 화면";
     }
 }

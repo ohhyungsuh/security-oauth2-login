@@ -16,7 +16,7 @@ public class UserController {
 
     @GetMapping("/my")
     public String my() {
-        return "my controller";
+        return "로그인 필요한 내 화면";
     }
 
     // 일반 회원가입
@@ -29,10 +29,9 @@ public class UserController {
     // 소셜 회원가입
     @PostMapping("/oauth2-join")
     public ResponseEntity<?> joinOAuth2User(@RequestBody OAuth2JoinDto joinDto) {
+        // todo: 소셜 회원가입 추가 정보 입력 기능 구현
         userService.joinOAuth2User(joinDto);
         return ResponseEntity.ok("oauth2 join success");
     }
-
-    // 일반 로그인
 
 }
