@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -52,15 +54,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
          * 서비스에서 받아온 정보가 중복될 가능성이 있으면 UUID 등을 통해 사용자를 식별할 수 있는 고유값을 만들어야 하지만,
          * 여기서는 email이 unique하기 때문에 괜찮다.
          */
-        User user = getOrSave(oAuth2UserDto);
 
-        return new PrincipalUserDetails(user, attributes);
+        Optional<User> findUser = userRepository.findByEmail(oAuth2UserDto.getEmail());
+
+        if(findUser.isEmpty()) {
+            userRepository.save(oAuth2UserDto.toUser());
+            return new PrincipalUserDetails(oAuth2UserDto.toUser(), attributes);
+        }
+
+        return new PrincipalUserDetails(findUser.get(), attributes);
     }
 
-    private User getOrSave(OAuth2UserDto oAuth2UserDto) {
-
-        User user = userRepository.findByEmail(oAuth2UserDto.getEmail())
-                .orElseGet(oAuth2UserDto::toUser);
-        return userRepository.save(user);
-    }
+//    private User getOrSave(OAuth2UserDto oAuth2UserDto) {
+//        User user = userRepository.findByEmail(oAuth2UserDto.getEmail())
+//                .orElseGet(oAuth2UserDto::toUser);
+//
+//        return userRepository.save(user);
+//    }
 }

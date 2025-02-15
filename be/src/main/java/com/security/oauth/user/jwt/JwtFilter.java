@@ -24,6 +24,12 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtFilter 실행됨: {}", request.getRequestURI());
 
+        // 특정 URI 요청은 필터링 제외
+        if (request.getRequestURI().equals("/endpoint")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String accessToken = request.getHeader("access");
         String refreshToken = request.getHeader("refresh");
 

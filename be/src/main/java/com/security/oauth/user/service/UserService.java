@@ -4,22 +4,29 @@ import com.security.oauth.user.domain.Provider;
 import com.security.oauth.user.domain.User;
 import com.security.oauth.user.dto.JoinDto;
 import com.security.oauth.user.dto.OAuth2JoinDto;
+import com.security.oauth.user.dto.UserDto;
+import com.security.oauth.user.dto.UserInfoDto;
 import com.security.oauth.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
+    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Transactional
     public void joinUser(JoinDto joinDto) {
 
         Optional<User> user = userRepository.findByEmail(joinDto.getEmail());
@@ -39,10 +46,26 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    public void joinOAuth2User(OAuth2JoinDto joinDto) {
+    @Transactional
+    public UserDto joinOAuth2User(OAuth2JoinDto joinDto, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
 
-//        User user = userRepository.findByEmail(join)
+        user.completeSignup(joinDto.getBirth());
 
-        System.out.println("joinOAuth2User");
+        return modelMapper.map(user, UserDto.class);
     }
+
+    public UserInfoDto getMyInfo(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+
+        return modelMapper.map(user, UserInfoDto.class);
+    }
+
+    public User getUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+    }
+
 }

@@ -42,9 +42,9 @@ public class SecurityConfig {
 
     // 홈 화면, css, error 페이지, 회원가입 및 로그인 api
     private final String[] whitelist = {
-            "/", "/login",
-            "/auth/success",
-            "/api/v1/users/oauth2-join",
+            "/", "/login", "/endpoint",
+            "/oauth/callback", "/oauth/join",
+            "/api/v1/users/oauth/join",
             "/api/v1/users/join",
             "/css/**", "/error"
     };
@@ -52,8 +52,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 됨 (cookie를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어)
-                // jwt 발급해서 stateless 상태로 관리하기 때문에 꺼도 된다
                 .csrf(AbstractHttpConfigurer::disable)
 
                 // 기본 loginForm 비활성화 - jwt + oauth2 사용하기 때문에
@@ -90,20 +88,18 @@ public class SecurityConfig {
     // WebMvcConfig에 설정하는 것과 차이?
     public CorsConfigurationSource setCorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // 프론트 주소 필요
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 프론트 주소 필요
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
 
-//        // 쿠키 필요 없어서 우선 주석
-//        configuration.setAllowCredentials(true);
-//
-//        configuration.setExposedHeaders(List.of("Authorization"));
-//        configuration.setExposedHeaders(List.of("Set-Cookie"));
 
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of("Set-Cookie", "access", "refresh"));
+
+//        configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
 
         return source;
     }

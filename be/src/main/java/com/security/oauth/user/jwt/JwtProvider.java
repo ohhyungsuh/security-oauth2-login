@@ -118,16 +118,19 @@ public class JwtProvider {
      *     String getSignature(); // JWT 서명
      * }
      */
-    private Claims parseClaims(String refreshToken) {
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parser().verifyWith(secretKey).build()
-                    .parseSignedClaims(refreshToken)
+                    .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
             throw new JwtException("Invalid JWT token");
         }
+    }
 
+    public String getUsername(String token) {
+        return parseClaims(token).getSubject();
     }
 
     public String reissueAccessToken(String refreshToken) {

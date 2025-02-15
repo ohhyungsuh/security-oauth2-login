@@ -2,12 +2,12 @@ package com.security.oauth.user.handler;
 
 import com.security.oauth.user.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,22 +22,30 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.info("========== OAuth2SuccessHandler 실행됨 ==========");
-        log.info("Authentication: {}", authentication);
-        log.info("Principal: {}", authentication.getPrincipal());
-        log.info("Authorities: {}", authentication.getAuthorities());
-
-
         String access = jwtProvider.generateAccessToken(authentication);
         String refresh = jwtProvider.generateRefreshToken(authentication);
 
         log.info("생성된 access token: {}", access);
         log.info("생성된 refresh token: {}", refresh);
 
-        response.setHeader("access", access);
-        response.setHeader("refresh", refresh);
+//        // todo: 리프레시 토큰은 따로 관리 필요
+//        response.setHeader("access", access);
+//        response.setHeader("refresh", refresh);
 
-//        // 리다이렉트 주소 따로
-//        response.sendRedirect("http://localhost:8080/auth/success");
+        response.addCookie(createCookie("access", access));
+        response.addCookie(createCookie("refresh", refresh));
+
+        String redirectUrl = "http://localhost:5173/oauth/callback";
+        response.sendRedirect(redirectUrl);
+    }
+
+    private Cookie createCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+//        cookie.setSecure(true);
+//        cookie.setAttribute("SameSite", "Strict"); // CSRF 방지
+        return cookie;
     }
 }

@@ -34,30 +34,7 @@ public class User extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-//    // 일반 회원가입 Builder
-//    @Builder(builderMethodName = "localUserBuilder")
-//    private User(String name, String email, String password, LocalDate birth) {
-//        this.name = name;
-//        this.email = email;
-//        this.password = password;
-//        this.birth = birth;
-//
-//        this.provider = Provider.LOCAL;
-//        this.role = Role.USER;
-//        this.isDeleted = false;
-//    }
-
-//    // 소셜 회원가입 Builder
-//    @Builder(builderMethodName = "oAuth2UserBuilder")
-//    private User(String name, String email, Provider provider) {
-//        this.name = name;
-//        this.email = email;
-//        this.provider = provider;
-//
-//        this.password = "";
-//        this.role = Role.USER;
-//        this.isDeleted = false;
-//    }
+    private boolean isNew;
 
     // 일반 회원가입 생성자
     private User(String name, String email, String password, LocalDate birth) {
@@ -69,6 +46,7 @@ public class User extends BaseTimeEntity {
         this.provider = Provider.LOCAL;
         this.role = Role.USER;
         this.isDeleted = false;
+        this.isNew = false;
     }
 
     // 소셜 회원가입 생성자
@@ -80,24 +58,8 @@ public class User extends BaseTimeEntity {
         this.password = "";
         this.role = Role.USER;
         this.isDeleted = false;
+        this.isNew = true;
     }
-
-//    public static User joinLocalUser(String name, String email, String password, LocalDate birth) {
-//        return User.localUserBuilder()
-//                .name(name)
-//                .email(email)
-//                .password(password)
-//                .birth(birth)
-//                .build();
-//    }
-
-//    public static User joinOAuth2User(String name, String email, Provider provider) {
-//        return User.oAuth2UserBuilder()
-//                .name(name)
-//                .email(email)
-//                .provider(provider)
-//                .build();
-//    }
 
     public static User joinLocalUser(String name, String email, String password, LocalDate birth) {
         return new User(name, email, password, birth);
@@ -108,7 +70,8 @@ public class User extends BaseTimeEntity {
     }
 
     // OAuth2 회원가입시 사용
-    public void updateOAuth2UserBirth(LocalDate birth) {
+    public void completeSignup(LocalDate birth) {
         this.birth = birth;
+        this.isNew = false;
     }
 }
